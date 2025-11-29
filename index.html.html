@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Bot Creator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #312e81 0%, #7e22ce 50%, #ec4899 100%);
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="p-6">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-4">🤖 Discord Bot Creator</h1>
+            <p class="text-purple-200">Crée ton bot Discord personnalisé avec toutes les commandes !</p>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="flex justify-center mb-8 gap-4" id="progress">
+            <div class="flex items-center gap-2">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold bg-purple-500 text-white" id="step1-circle">1</div>
+                <span class="text-white font-medium">Config</span>
+            </div>
+            <div class="flex items-center gap-2 opacity-40" id="step2-indicator">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold bg-gray-600 text-gray-300" id="step2-circle">2</div>
+                <span class="text-white font-medium">Commandes</span>
+            </div>
+            <div class="flex items-center gap-2 opacity-40" id="step3-indicator">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold bg-gray-600 text-gray-300" id="step3-circle">3</div>
+                <span class="text-white font-medium">Générer</span>
+            </div>
+        </div>
+
+        <!-- Step 1: Configuration -->
+        <div id="step1" class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 mb-6 border border-white/20">
+            <h2 class="text-2xl font-bold text-white mb-6">⚙️ Configuration du Bot</h2>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-white font-medium mb-2">🔑 Token Discord du Bot</label>
+                    <input type="password" id="token" placeholder="Colle ton token ici (optionnel)" 
+                           class="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <p class="text-purple-200 text-xs mt-2">⚠️ Garde-le secret ! Tu peux aussi le mettre plus tard directement dans le code.</p>
+                </div>
+
+                <div>
+                    <label class="block text-white font-medium mb-2">Nom du Bot</label>
+                    <input type="text" id="botName" value="MonBot" placeholder="MonBot"
+                           class="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+
+                <div>
+                    <label class="block text-white font-medium mb-2">Préfixe des commandes</label>
+                    <input type="text" id="prefix" value="^^" placeholder="^^"
+                           class="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+
+                <div>
+                    <label class="block text-white font-medium mb-2">Couleur principale</label>
+                    <div class="flex gap-3 items-center">
+                        <input type="color" id="colorPicker" value="#5865F2" class="h-12 w-24 rounded-lg cursor-pointer">
+                        <input type="text" id="colorText" value="#5865F2"
+                               class="flex-1 px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="goToStep2()" class="mt-8 w-full py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all transform hover:scale-105">
+                Suivant : Choisir les commandes →
+            </button>
+        </div>
+
+        <!-- Step 2: Commands Selection -->
+        <div id="step2" class="hidden bg-white/10 backdrop-blur-lg rounded-2xl p-8 mb-6 border border-white/20">
+            <h2 class="text-2xl font-bold text-white mb-2">⚡ Sélectionne les commandes</h2>
+            <p class="text-purple-200 mb-6"><span id="cmdCount">7</span> commandes sélectionnées</p>
+
+            <div class="space-y-6 max-h-96 overflow-y-auto pr-2" id="commandsList"></div>
+
+            <div class="flex gap-4 mt-8">
+                <button onclick="goToStep1()" class="flex-1 py-4 bg-white/10 text-white font-bold rounded-lg hover:bg-white/20 transition">
+                    ← Retour
+                </button>
+                <button onclick="goToStep3()" class="flex-1 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all transform hover:scale-105">
+                    Générer le bot →
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 3: Generate & Download -->
+        <div id="step3" class="hidden bg-white/10 backdrop-blur-lg rounded-2xl p-8 mb-6 border border-white/20">
+            <h2 class="text-2xl font-bold text-white mb-6">📥 Ton Bot est prêt !</h2>
+
+            <div class="bg-black/40 rounded-lg p-6 mb-6 relative">
+                <pre class="text-green-300 text-sm overflow-x-auto max-h-96"><code id="generatedCode"></code></pre>
+                <button onclick="copyCode()" class="absolute top-4 right-4 p-2 bg-purple-500 rounded-lg hover:bg-purple-600 transition">
+                    📋 Copier
+                </button>
+            </div>
+
+            <div class="bg-green-500/20 border border-green-500/50 rounded-lg p-4 mb-6">
+                <h3 class="text-green-300 font-bold mb-2">✅ Installation rapide</h3>
+                <ol class="text-green-100 text-sm space-y-2 ml-4 list-decimal">
+                    <li>Sauvegarde le code dans un fichier <code class="bg-black/30 px-2 py-1 rounded">bot.js</code></li>
+                    <li>Crée ton bot sur <a href="https://discord.com/developers/applications" target="_blank" class="underline">Discord Developer Portal</a></li>
+                    <li>Active les intents: Server Members, Message Content, Guilds</li>
+                    <li>Installe discord.js: <code class="bg-black/30 px-2 py-1 rounded">npm install discord.js</code></li>
+                    <li>Lance ton bot: <code class="bg-black/30 px-2 py-1 rounded">node bot.js</code></li>
+                </ol>
+            </div>
+
+            <div class="flex gap-4">
+                <button onclick="goToStep2()" class="flex-1 py-4 bg-white/10 text-white font-bold rounded-lg hover:bg-white/20 transition">
+                    ← Modifier
+                </button>
+                <button onclick="downloadBot()" class="flex-1 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all transform hover:scale-105">
+                    📥 Télécharger bot.js
+                </button>
+                <button onclick="copyCode()" class="flex-1 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all transform hover:scale-105">
+                    📋 Copier le code
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const commandCategories = {
+            'Basique': ['help', 'ping', 'invite', 'userinfo', 'whois', 'serverinfo', 'avatar', 'banner', 'roleinfo', 'members'],
+            'Modération': ['ban', 'unban', 'softban', 'kick', 'mute', 'unmute', 'timeout', 'warn', 'warns', 'clearwarns', 'purge', 'slowmode', 'lock', 'unlock', 'nuke'],
+            'Roles & Membres': ['addrole', 'delrole', 'derank', 'nick', 'setnick', 'resetnick'],
+            'Auto-Actions': ['autorole', 'autorole set', 'autorole remove', 'welcome', 'welcome set', 'welcome test', 'goodbye', 'goodbye set'],
+            'AutoMod': ['automod', 'automod enable', 'automod disable', 'automod config'],
+            'Système': ['logs', 'logs enable', 'logs disable', 'reactionrole', 'reactionrole add', 'reactionrole remove', 'prefix'],
+            'Niveaux/XP': ['rank', 'leaderboard', 'setxp', 'addxp', 'removexp', 'levelup'],
+            'Économie': ['balance', 'daily', 'weekly', 'monthly', 'pay', 'work', 'topmoney'],
+            'Fun': ['8ball', 'coinflip', 'dice', 'rps', 'fight', 'kiss', 'slap', 'hug', 'ship', 'meme', 'reverse', 'choose'],
+            'Images': ['blur', 'pixel', 'invert', 'sepia', 'rotate', 'triggered', 'wasted', 'wanted', 'rip', 'petpet', 'ascii'],
+            'Animaux': ['cat', 'dog', 'fox', 'panda', 'koala', 'bird', 'redpanda'],
+            'Utilitaires': ['youtube', 'google', 'wiki', 'weather', 'translate', 'anime', 'manga', 'reddit'],
+            'RSS': ['rss', 'rss add', 'rss remove', 'rss list'],
+            'Musique': ['play', 'skip', 'stop', 'pause', 'resume', 'queue', 'np']
+        };
+
+        let selectedCommands = new Set(['help', 'ping', 'userinfo', 'avatar', 'purge', 'ban', 'kick']);
+
+        function initCommands() {
+            const container = document.getElementById('commandsList');
+            container.innerHTML = '';
+
+            for (const [category, commands] of Object.entries(commandCategories)) {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'bg-white/5 rounded-lg p-4';
+                
+                const header = document.createElement('div');
+                header.className = 'flex items-center gap-2 mb-3 cursor-pointer hover:bg-white/10 p-2 rounded transition';
+                header.onclick = () => toggleCategory(category);
+                
+                const allSelected = commands.every(cmd => selectedCommands.has(cmd));
+                header.innerHTML = `
+                    <input type="checkbox" ${allSelected ? 'checked' : ''} class="w-5 h-5 rounded" onclick="event.stopPropagation(); toggleCategory('${category}')">
+                    <h3 class="text-lg font-bold text-white">${category}</h3>
+                    <span class="text-purple-300 text-sm">(${commands.length})</span>
+                `;
+                
+                const buttonsDiv = document.createElement('div');
+                buttonsDiv.className = 'flex flex-wrap gap-2';
+                
+                commands.forEach(cmd => {
+                    const btn = document.createElement('button');
+                    btn.className = `px-3 py-1 rounded-full text-sm font-medium transition ${
+                        selectedCommands.has(cmd) ? 'bg-purple-500 text-white' : 'bg-white/10 text-purple-200 hover:bg-white/20'
+                    }`;
+                    btn.textContent = cmd;
+                    btn.onclick = () => toggleCommand(cmd);
+                    buttonsDiv.appendChild(btn);
+                });
+                
+                categoryDiv.appendChild(header);
+                categoryDiv.appendChild(buttonsDiv);
+                container.appendChild(categoryDiv);
+            }
+            
+            updateCount();
+        }
+
+        function toggleCommand(cmd) {
+            if (selectedCommands.has(cmd)) {
+                selectedCommands.delete(cmd);
+            } else {
+                selectedCommands.add(cmd);
+            }
+            initCommands();
+        }
+
+        function toggleCategory(category) {
+            const commands = commandCategories[category];
+            const allSelected = commands.every(cmd => selectedCommands.has(cmd));
+            
+            if (allSelected) {
+                commands.forEach(cmd => selectedCommands.delete(cmd));
+            } else {
+                commands.forEach(cmd => selectedCommands.add(cmd));
+            }
+            initCommands();
+        }
+
+        function updateCount() {
+            document.getElementById('cmdCount').textContent = selectedCommands.size;
+        }
+
+        function goToStep1() {
+            document.getElementById('step1').classList.remove('hidden');
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.add('hidden');
+            updateProgress(1);
+        }
+
+        function goToStep2() {
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.remove('hidden');
+            document.getElementById('step3').classList.add('hidden');
+            initCommands();
+            updateProgress(2);
+        }
+
+        function goToStep3() {
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.remove('hidden');
+            generateCode();
+            updateProgress(3);
+        }
+
+        function updateProgress(step) {
+            for (let i = 1; i <= 3; i++) {
+                const indicator = document.getElementById(`step${i}-indicator`);
+                const circle = document.getElementById(`step${i}-circle`);
+                
+                if (i <= step) {
+                    indicator.classList.remove('opacity-40');
+                    indicator.classList.add('opacity-100');
+                    circle.classList.remove('bg-gray-600', 'text-gray-300');
+                    circle.classList.add('bg-purple-500', 'text-white');
+                } else {
+                    indicator.classList.remove('opacity-100');
+                    indicator.classList.add('opacity-40');
+                    circle.classList.remove('bg-purple-500', 'text-white');
+                    circle.classList.add('bg-gray-600', 'text-gray-300');
+                }
+            }
+        }
+
+        function generateCode() {
+            const botName = document.getElementById('botName').value || 'MonBot';
+            const prefix = document.getElementById('prefix').value || '^^';
+            const color = document.getElementById('colorText').value || '#5865F2';
+            const token = document.getElementById('token').value || 'METS_TON_TOKEN_ICI';
+
+            const commandsCode = Array.from(selectedCommands).map(cmd => {
+                return `
+  if (command === '${cmd}') {
+    const embed = new Discord.EmbedBuilder()
+      .setColor('${color}')
+      .setTitle('${cmd.toUpperCase()}')
+      .setDescription('Commande ${cmd} exécutée!')
+      .setTimestamp();
+    return message.reply({ embeds: [embed] });
+  }`;
+            }).join('\n');
+
+            const code = `// Bot Discord: ${botName}
+// Généré avec Discord Bot Creator
+
+const Discord = require('discord.js');
+const client = new Discord.Client({ 
+  intents: [
+    Discord.GatewayIntentBits.Guilds,
+    Discord.GatewayIntentBits.GuildMessages,
+    Discord.GatewayIntentBits.MessageContent,
+    Discord.GatewayIntentBits.GuildMembers,
+    Discord.GatewayIntentBits.GuildModeration
+  ] 
+});
+
+const PREFIX = '${prefix}';
+const COLOR = '${color}';
+const TOKEN = '${token}';
+
+client.once('ready', () => {
+  console.log('✅ ${botName} est en ligne !');
+  console.log(\`Connecté en tant que \${client.user.tag}\`);
+  client.user.setActivity('${prefix}help', { type: Discord.ActivityType.Watching });
+});
+
+client.on('messageCreate', async message => {
+  if (!message.content.startsWith(PREFIX) || message.author.bot) return;
+  
+  const args = message.content.slice(PREFIX.length).trim().split(/ +/);
+  const command = args.shift().toLowerCase();
+
+  try {
+${commandsCode}
+  } catch (error) {
+    console.error('Erreur:', error);
+    message.reply('❌ Une erreur s\\'est produite!');
+  }
+});
+
+client.login(TOKEN);
+
+// Package.json nécessaire:
+// {
+//   "name": "${botName.toLowerCase().replace(/\s+/g, '-')}",
+//   "version": "1.0.0",
+//   "main": "bot.js",
+//   "dependencies": {
+//     "discord.js": "^14.14.1"
+//   }
+// }`;
+
+            document.getElementById('generatedCode').textContent = code;
+        }
+
+        function copyCode() {
+            const code = document.getElementById('generatedCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('✅ Code copié dans le presse-papier !');
+            });
+        }
+
+        function downloadBot() {
+            const code = document.getElementById('generatedCode').textContent;
+            const blob = new Blob([code], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'bot.js';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Sync color picker with text input
+        document.getElementById('colorPicker').addEventListener('input', (e) => {
+            document.getElementById('colorText').value = e.target.value;
+        });
+        
+        document.getElementById('colorText').addEventListener('input', (e) => {
+            document.getElementById('colorPicker').value = e.target.value;
+        });
+
+        // Initialize
+        initCommands();
+    </script>
+</body>
+</html>
